@@ -27,6 +27,12 @@
             NSLog(@"%d",i);
         });
     }
+    
+//    [self gcdUsingContine];
+//    [self gcdUsingContinue2];
+//    [self gcdUsingContinue3];
+    [self gcdUsingContinue4];
+//    [self gcdUsingContinue5];
 }
 
 - (IBAction)serialQueueClick:(id)sender {
@@ -161,6 +167,118 @@
 - (IBAction)resumeQueqeClick:(id)sender {
     // 继续一个队列
     dispatch_resume(_queue);
+}
+
+- (void)gcdUsingContine
+{
+    dispatch_queue_t queue1 = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    NSMutableArray *arr = [NSMutableArray array];
+    //  准备数组
+    for (int i=0; i<100; i++) {
+        [arr addObject:[NSNumber numberWithInt:i]];
+    }
+    for (int i=0; i<arr.count; i++) {
+        dispatch_async(queue1, ^{
+            //  平行运算，执行
+//            NSLog(@"%@", [arr objectAtIndex:i]);
+            NSLog(@"后执行");
+        });
+    }
+    
+    NSLog(@"先执行，在for循环还没执行完就输出了");
+}
+
+//  使用dispatch_group_async + dispatch_group_wait
+- (void)gcdUsingContinue2
+{
+    dispatch_queue_t queue1 = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_group_t group1 = dispatch_group_create();
+    NSMutableArray *arr = [NSMutableArray array];
+    //  准备数组
+    for (int i=0; i<100; i++) {
+        [arr addObject:[NSNumber numberWithInt:i]];
+    }
+    
+    for (int i=0; i<arr.count; i++) {
+        dispatch_group_async(group1, queue1, ^{
+            //  平行运算，执行
+//            NSLog(@"%@", [arr objectAtIndex:i]);
+            NSLog(@"先执行");
+        });
+    }
+    
+    //  等上面的for循环(等待group里的线程)都执行完了，再执行下面的内容
+    dispatch_group_wait(group1, DISPATCH_TIME_FOREVER);
+    NSLog(@"后执行 ,for循环执行完后，再输出");
+}
+
+//  使用dispatch_group_async + dispatch_group_notify
+- (void)gcdUsingContinue3
+{
+    dispatch_queue_t queue1 = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_group_t group1 = dispatch_group_create();
+    NSMutableArray *arr = [NSMutableArray array];
+    //  准备数组
+    for (int i=0; i<100; i++) {
+        [arr addObject:[NSNumber numberWithInt:i]];
+    }
+    
+    for (int i=0; i<arr.count; i++) {
+        dispatch_group_async(group1, queue1, ^{
+            //  平行运算，执行
+//            NSLog(@"%@", [arr objectAtIndex:i]);
+            NSLog(@"先执行");
+        });
+    }
+    
+    dispatch_group_notify(group1, queue1, ^{
+        
+        //  如果是等上面的线程都操作完，更改UI，那么queue1换成主线程即可
+        NSLog(@"for循环执行完后，再输出");
+    });
+}
+
+//  使用dispatch_apply，同步版
+- (void)gcdUsingContinue4
+{
+    dispatch_queue_t queue1 = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_group_t group1 = dispatch_group_create();
+    NSMutableArray *arr = [NSMutableArray array];
+    //  准备数组
+    for (int i=0; i<100; i++) {
+        [arr addObject:[NSNumber numberWithInt:i]];
+    }
+    
+    //  dispatch_apply是同步的，没有异步版本。
+    dispatch_apply(arr.count, queue1, ^(size_t index) {
+        //  平行运算，执行
+//        NSLog(@"%@", [arr objectAtIndex:index]);
+        NSLog(@"22222-------先执行");
+    });
+    NSLog(@"222222-------后执行，执行完上面的再执行此行");
+    
+    
+}
+
+//  使用dispatch_apply，异步版
+- (void)gcdUsingContinue5
+{
+    dispatch_queue_t queue1 = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    NSMutableArray *arr = [NSMutableArray array];
+    //  准备数组
+    for (int i=0; i<100; i++) {
+        [arr addObject:[NSNumber numberWithInt:i]];
+    }
+    
+    //  如果要让dispatch_apply异步，达到上述同样效果，那么
+    dispatch_async(queue1, ^{
+        dispatch_apply(arr.count, queue1, ^(size_t index) {
+            //  平行运算，执行
+            NSLog(@"%@", [arr objectAtIndex:index]);
+            NSLog(@"333333-------先执行");
+        });
+        NSLog(@"3333333--------后执行，执行完上面的再执行此行");
+    });
 }
 
 - (void)didReceiveMemoryWarning
