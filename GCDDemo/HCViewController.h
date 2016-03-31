@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HCViewController : UIViewController
+@interface HCViewController : UIViewController {
+    dispatch_queue_t _queue;
+}
 
 @end
