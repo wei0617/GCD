@@ -8,8 +8,9 @@
 
 #import "HCViewController.h"
 
-@interface HCViewController ()
-
+@interface HCViewController () {
+    dispatch_semaphore_t _sema;
+}
 @end
 
 @implementation HCViewController
@@ -33,6 +34,8 @@
 //    [self gcdUsingContinue3];
     [self gcdUsingContinue4];
 //    [self gcdUsingContinue5];
+    
+    [self semaphoreUsing];
 }
 
 - (IBAction)serialQueueClick:(id)sender {
@@ -279,6 +282,61 @@
         });
         NSLog(@"3333333--------后执行，执行完上面的再执行此行");
     });
+}
+
+- (void)semaphoreUsing
+{
+    // 创建一个信号量并指定一个初始值，一般赋0
+    _sema = dispatch_semaphore_create(0);
+    
+    dispatch_queue_t queue = dispatch_queue_create("wei", NULL);
+    
+    dispatch_async(queue, ^{
+        NSLog(@"我叫小明,我要一个鸡蛋饼");
+        // dispatch_semaphore_wait等待一个信号量,如果信号量的值大于0,那么对信号量-1, 此时信号量为0，则结束等待.如果信号量等于0,则等待,直到信号量再大于0,对信号量-1后,然后结束等待
+        
+        //  dispatch_semaphore_wait
+        //  a.  当信号量为0时就等待，停止执行下面的
+        //  b.  当信号量+1了时，通过wait，并使信号量-1
+        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+        NSLog(@"小明购买成功");
+    });
+    
+    dispatch_async(queue, ^{
+        NSLog(@"我叫小黑,我要一个鸡蛋饼");
+        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+        NSLog(@"小黑购买成功");
+    });
+    
+    dispatch_async(queue, ^{
+        NSLog(@"我叫老王,我要一个鸡蛋饼");
+        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+        NSLog(@"老王购买成功");
+    });
+    
+    
+    //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    //        NSLog(@"我叫小明,我要一个鸡蛋饼");
+    //        // dispatch_semaphore_wait等待一个信号量,如果信号量的值大于0,那么对信号量-1,并结束等待.如果信号量等于0,则等待,直到信号量再大于0,对信号量-1,然后结束等待
+    //        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+    //        NSLog(@"小明购买成功");
+    //    });
+    //
+    //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    //        NSLog(@"我叫小黑,我要一个鸡蛋饼");
+    //        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+    //        NSLog(@"小黑购买成功");
+    //    });
+    //
+    //    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    //        NSLog(@"我叫老王,我要一个鸡蛋饼");
+    //        dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+    //        NSLog(@"老王购买成功");
+    //    });
+}
+- (IBAction)createEggPie:(id)sender {
+    // dispatch_semaphore_signal 给一个信号量发送信号,发送之后,此信号量加1
+    dispatch_semaphore_signal(_sema);
 }
 
 - (void)didReceiveMemoryWarning

@@ -72,6 +72,15 @@
                                     <action selector="resumeQueqeClick:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="uvR-tN-iV5"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v9M-jq-ck9">
+                                <rect key="frame" x="108" y="279" width="105" height="30"/>
+                                <animations/>
+                                <color key="backgroundColor" red="0.37755373440000001" green="1" blue="0.14497604929999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="我要一个鸡蛋饼"/>
+                                <connections>
+                                    <action selector="createEggPie:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="oO4-Og-UYY"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
